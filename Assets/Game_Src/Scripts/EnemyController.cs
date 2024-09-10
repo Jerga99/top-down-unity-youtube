@@ -45,6 +45,7 @@ public class EnemyController : MonoBehaviour
         {
             CalculateSeparationForce(neigbours);
             ApplyAllignment(neigbours);
+            ApplyCohesion(neigbours);
         }
 
         if (distance > m_StopDistance)
@@ -97,6 +98,24 @@ public class EnemyController : MonoBehaviour
         }
 
         m_SeparationForce += neighboursForward;
+    }
+
+    // Step 4
+    // The purpose of this rule is to keep the enemies moving toward the center of the group,
+    // creating a sense of unity in their movement.
+    private void ApplyCohesion(Collider[] neighbours)
+    {
+        Vector3 averagePosition = Vector3.zero;
+
+        foreach (var neighbour in neighbours)
+        {
+            averagePosition += neighbour.transform.position;
+        }
+
+        averagePosition /= neighbours.Length;
+
+        Vector3 cohesionDir = (averagePosition - transform.position).normalized;
+        m_SeparationForce += cohesionDir;
     }
 
     private void MoveTowardsTarget()
