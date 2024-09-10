@@ -519,6 +519,23 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &1829252930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1829252924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 539246a93e5c64a229a246044f23af3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Speed: 5
+  m_RotationSpeed: 10
+  m_FloorMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1001 &4609820654168102162
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -653,6 +670,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 269500813267529465, guid: aefd990d8e1e6465aa5066c47e515001, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1829252928}
+    - targetCorrespondingSourceObject: {fileID: 269500813267529465, guid: aefd990d8e1e6465aa5066c47e515001, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1829252930}
   m_SourcePrefab: {fileID: 100100000, guid: aefd990d8e1e6465aa5066c47e515001, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
