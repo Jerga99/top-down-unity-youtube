@@ -10,6 +10,9 @@ public class EnemyController : MonoBehaviour
     [Header("Boids")]
     [SerializeField]
     private float m_DetectionDistance = 1f;
+    [SerializeField] private float m_SeparationWeight = 2f;
+    [SerializeField] private float m_AlignmentWeight = 1.0f;
+    [SerializeField] private float m_CohesionWeight = 1.0f;
 
     private Animator m_Animator;
     private Transform m_Target;
@@ -78,7 +81,7 @@ public class EnemyController : MonoBehaviour
 
             if (distance > 0)
             {
-                m_SeparationForce += away / distance;
+                m_SeparationForce += (away / distance) * m_SeparationWeight;
             }
         }
     }
@@ -97,7 +100,7 @@ public class EnemyController : MonoBehaviour
             neighboursForward.Normalize();
         }
 
-        m_SeparationForce += neighboursForward;
+        m_SeparationForce += neighboursForward * m_AlignmentWeight;
     }
 
     // Step 4
@@ -115,7 +118,7 @@ public class EnemyController : MonoBehaviour
         averagePosition /= neighbours.Length;
 
         Vector3 cohesionDir = (averagePosition - transform.position).normalized;
-        m_SeparationForce += cohesionDir;
+        m_SeparationForce += cohesionDir * m_CohesionWeight;
     }
 
     private void MoveTowardsTarget()
