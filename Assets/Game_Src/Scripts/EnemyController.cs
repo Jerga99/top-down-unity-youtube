@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
@@ -6,13 +7,17 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float m_RotationSpeed = 8f;
     [SerializeField] private float m_StopDistance = 1.5f; // Distance at which the enemy stops following
 
+    [Header("Boids")]
+    [SerializeField]
+    private float m_DetectionDistance = 1f;
+
     private Animator m_Animator;
     private Transform m_Target;
 
     private Vector3 m_Direction = Vector3.zero;
     private Quaternion m_TargetRotation;
-
     private float m_MovementSpeedBlend;
+    private Vector3 m_SeparationForce;
 
     private void Awake()
     {
@@ -30,8 +35,17 @@ public class EnemyController : MonoBehaviour
 
     private void FollowTarget()
     {
+        m_SeparationForce = Vector3.zero;
         m_Direction = (m_Target.position - transform.position).WithNewY(0);
         float distance = m_Direction.magnitude;
+
+        var neigbours = GetNeighbours();
+
+        if (neigbours.Length > 0)
+        {
+            CalculateSeparationForce(neigbours);
+            ApplyAllignment(neigbours);
+        }
 
         if (distance > m_StopDistance)
         {
@@ -45,10 +59,51 @@ public class EnemyController : MonoBehaviour
         RotateTowardsTarget();
     }
 
+    // 1. Define Neighbor Detection
+    private Collider[] GetNeighbours()
+    {
+        var enemyMask = LayerMask.GetMask("Enemy");
+        return Physics.OverlapSphere(transform.position, m_DetectionDistance, enemyMask);
+    }
+
+    // 2. Separation Rule
+    private void CalculateSeparationForce(Collider[] neighbours)
+    {
+        foreach (var neighbour in neighbours)
+        {
+            var dir = neighbour.transform.position - transform.position;
+            var distance = dir.magnitude;
+            var away = -dir.normalized;
+
+            if (distance > 0)
+            {
+                m_SeparationForce += away / distance;
+            }
+        }
+    }
+
+    private void ApplyAllignment(Collider[] neighbours)
+    {
+        Vector3 neighboursForward = Vector3.zero;
+
+        foreach (var neighbour in neighbours)
+        {
+            neighboursForward += neighbour.transform.forward;
+        }
+
+        if (neighboursForward != Vector3.zero)
+        {
+            neighboursForward.Normalize();
+        }
+
+        m_SeparationForce += neighboursForward;
+    }
+
     private void MoveTowardsTarget()
     {
         m_Direction = m_Direction.normalized;
-        Vector3 movement = m_Direction * m_Speed * Time.deltaTime;
+        var combinedDirection = (m_Direction + m_SeparationForce).normalized;
+        Vector3 movement = combinedDirection * m_Speed * Time.deltaTime;
         transform.position += movement;
         m_MovementSpeedBlend = Mathf.Lerp(m_MovementSpeedBlend, 1, Time.deltaTime * m_Speed);
         m_Animator.SetFloat("Speed", m_MovementSpeedBlend);
